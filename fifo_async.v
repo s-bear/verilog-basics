@@ -91,7 +91,7 @@ module fifo_async #(
     input wire read_clk,
     input wire read_reset,
     input wire read_en,
-    output wire [DataWidth-1:0] read_data,
+    output reg [DataWidth-1:0] read_data,
     output reg fifo_empty
 );
 
@@ -118,10 +118,6 @@ reg [AddrWidth:0] read_addr, read_addr_D;
 reg [AddrWidth:0] read_addr_gray, read_addr_gray_D;
 wire [AddrWidth:0] write_addr_gray_sync;
 reg fifo_empty_D;
-
-//always read
-//exclude the extra address bit when reading the memory!
-assign read_data = mem[read_addr[AddrWidth-1:0]];
 
 //initialize memory from file. NOTE: clobbered by write_reset!
 generate
@@ -211,10 +207,13 @@ always @(posedge read_clk or posedge read_reset) begin
         read_addr <= 0;
         read_addr_gray <= 0;
         fifo_empty <= 1'b1;
+        read_data <= 0;
     end else begin
         read_addr <= read_addr_D;
         read_addr_gray <= read_addr_gray_D;
         fifo_empty <= fifo_empty_D;
+        //always read
+        read_data <= mem[read_addr_D[AddrWidth-1:0]];
     end
 end
 

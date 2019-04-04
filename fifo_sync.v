@@ -46,7 +46,7 @@ module fifo_sync #(
     output reg fifo_full,
     //read interface
     input wire read_en,
-    output wire [DataWidth-1:0] read_data,
+    output reg [DataWidth-1:0] read_data,
     output reg fifo_empty
 );
 
@@ -56,12 +56,11 @@ reg [DataWidth-1:0] mem [DataDepth-1:0];
 //addressing
 reg [AddrWidth-1:0] write_addr, write_addr_D;
 reg [AddrWidth-1:0] read_addr, read_addr_D;
+reg first_write, first_write_D; //first write after being empty
 reg do_write, fifo_full_D, fifo_empty_D;
 
 wire [AddrWidth-1:0] next_write_addr = (write_addr + 1) % DataDepth;
 wire [AddrWidth-1:0] next_read_addr = (read_addr + 1) % DataDepth;
-
-assign read_data = mem[read_addr];
 
 //init from file. n.b. clobbered by reset!
 generate
@@ -80,6 +79,8 @@ always @* begin
     read_addr_D = read_addr;
     fifo_full_D = fifo_full;
     fifo_empty_D = fifo_empty;
+    first_write_D = first_write;
+    if(first_write == 1'b0) fifo_empty_D = 1'b0;
     do_write = 1'b0;
     if(write_en == 1'b1 && read_en == 1'b1) begin
         //reading and writing at the same time
@@ -87,7 +88,7 @@ always @* begin
         write_addr_D = next_write_addr;
         if(fifo_empty == 1'b1) begin //we can only write
             fifo_full_D = (next_write_addr == read_addr);
-            fifo_empty_D = 1'b0;
+            first_write_D = 1'b0;
         end else begin //even if the fifo is full we can write
             read_addr_D = next_read_addr;
             //neither empty nor full status will change
@@ -98,7 +99,7 @@ always @* begin
             do_write = 1'b1;
             write_addr_D = next_write_addr;
             fifo_full_D = (next_write_addr == read_addr);
-            fifo_empty_D = 1'b0;
+            if(fifo_empty) first_write_D = 1'b0;
         end
     end else if(read_en == 1'b1) begin
         if(fifo_empty == 1'b0) begin
@@ -106,6 +107,7 @@ always @* begin
             fifo_full_D = 1'b0;
             read_addr_D = next_read_addr;
             fifo_empty_D = (next_read_addr == write_addr);
+            first_write_D = fifo_empty_D;
         end
     end
 end
@@ -117,14 +119,19 @@ always @(posedge clk) begin
         read_addr <= 0;
         fifo_full <= 1'b0;
         fifo_empty <= 1'b1;
+        read_data <= 0;
+        first_write <= 1'b1;
     end else begin 
         write_addr <= write_addr_D;
         read_addr <= read_addr_D;
         fifo_full <= fifo_full_D;
         fifo_empty <= fifo_empty_D;
+        first_write <= first_write_D;
         if(do_write == 1'b1) begin
             mem[write_addr] <= write_data;
         end
+        //always read:
+        read_data <= mem[read_addr_D];
     end
 end
 
