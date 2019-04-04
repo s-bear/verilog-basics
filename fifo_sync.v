@@ -18,7 +18,7 @@ fifo_sync #(
     .DataDepth(1024),
     .AddrWidth(10),
     .InitFile(""), //read using $readmemh if InitCount > 0
-    .InitCount(0) //number of words to read from InitFile, M= DataDepth
+    .InitCount(0) //number of words to read from InitFile, <= DataDepth
 ) fifo_sync_0 (
     .clk(),   //system clock
     .reset(), //system reset
