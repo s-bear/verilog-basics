@@ -1,0 +1,109 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Thu Apr  4 07:59:08 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_fifo_async.fst"
+[dumpfile_mtime] "Thu Apr  4 07:58:29 2019"
+[dumpfile_size] 2237
+[savefile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_fifo_async.gtkw"
+[timestart] 0
+[size] 1312 805
+[pos] -1 -1
+*-17.080256 270000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_fifo_async.
+[treeopen] test_fifo_async.fifo_async_0.
+[sst_width] 189
+[signals_width] 218
+[sst_expanded] 1
+[sst_vpaned_height] 232
+@200
+-WRITE DOMAIN
+@28
+test_fifo_async.write_clk
+test_fifo_async.write_reset
+test_fifo_async.write_en
+@22
+test_fifo_async.write_data[7:0]
+@28
+test_fifo_async.fifo_full
+@200
+-
+@c00022
+test_fifo_async.fifo_async_0.write_addr[4:0]
+@28
+(0)test_fifo_async.fifo_async_0.write_addr[4:0]
+(1)test_fifo_async.fifo_async_0.write_addr[4:0]
+(2)test_fifo_async.fifo_async_0.write_addr[4:0]
+(3)test_fifo_async.fifo_async_0.write_addr[4:0]
+(4)test_fifo_async.fifo_async_0.write_addr[4:0]
+@1401200
+-group_end
+@28
+test_fifo_async.fifo_async_0.fifo_full_D
+@c00022
+test_fifo_async.fifo_async_0.read_addr_gray_sync[4:0]
+@28
+(0)test_fifo_async.fifo_async_0.read_addr_gray_sync[4:0]
+(1)test_fifo_async.fifo_async_0.read_addr_gray_sync[4:0]
+(2)test_fifo_async.fifo_async_0.read_addr_gray_sync[4:0]
+(3)test_fifo_async.fifo_async_0.read_addr_gray_sync[4:0]
+(4)test_fifo_async.fifo_async_0.read_addr_gray_sync[4:0]
+@1401200
+-group_end
+@c00022
+test_fifo_async.fifo_async_0.write_addr_gray_D[4:0]
+@28
+(0)test_fifo_async.fifo_async_0.write_addr_gray_D[4:0]
+(1)test_fifo_async.fifo_async_0.write_addr_gray_D[4:0]
+(2)test_fifo_async.fifo_async_0.write_addr_gray_D[4:0]
+(3)test_fifo_async.fifo_async_0.write_addr_gray_D[4:0]
+(4)test_fifo_async.fifo_async_0.write_addr_gray_D[4:0]
+@1401200
+-group_end
+@22
+test_fifo_async.fifo_async_0.write_clk_sync.genblk2.shiftreg[9:0]
+@200
+-READ DOMAIN
+@28
+test_fifo_async.read_clk
+test_fifo_async.read_reset
+@29
+test_fifo_async.read_en
+@22
+test_fifo_async.read_data[7:0]
+@28
+test_fifo_async.fifo_empty
+@200
+-
+@c00022
+test_fifo_async.fifo_async_0.read_addr[4:0]
+@28
+(0)test_fifo_async.fifo_async_0.read_addr[4:0]
+(1)test_fifo_async.fifo_async_0.read_addr[4:0]
+(2)test_fifo_async.fifo_async_0.read_addr[4:0]
+(3)test_fifo_async.fifo_async_0.read_addr[4:0]
+(4)test_fifo_async.fifo_async_0.read_addr[4:0]
+@1401200
+-group_end
+@28
+test_fifo_async.fifo_async_0.fifo_empty_D
+@22
+test_fifo_async.fifo_async_0.write_addr_gray_sync[4:0]
+test_fifo_async.fifo_async_0.read_addr_gray_D[4:0]
+@c00022
+test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+@28
+(0)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(1)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(2)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(3)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(4)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(5)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(6)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(7)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(8)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+(9)test_fifo_async.fifo_async_0.read_clk_sync.genblk2.shiftreg[9:0]
+@1401200
+-group_end
+[pattern_trace] 1
+[pattern_trace] 0

@@ -1,0 +1,82 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Wed Apr  3 00:39:55 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_spi_master_slave.fst"
+[dumpfile_mtime] "Tue Apr  2 10:32:36 2019"
+[dumpfile_size] 2761
+[savefile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_spi_master_slave.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -1 -1
+*-17.787739 2540000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_spi_master_slave.
+[treeopen] test_spi_master_slave.spi_master_0.
+[treeopen] test_spi_master_slave.spi_slave_0.
+[sst_width] 189
+[signals_width] 247
+[sst_expanded] 1
+[sst_vpaned_height] 307
+@28
+test_spi_master_slave.clk
+test_spi_master_slave.reset
+test_spi_master_slave.transfer
+@200
+-
+-Master
+@28
+test_spi_master_slave.spi_master_0.nbits_m1[2:0]
+@22
+test_spi_master_slave.spi_master_0.mosi_word_in[7:0]
+@28
+test_spi_master_slave.spi_master_0.mosi_accepted
+@22
+test_spi_master_slave.spi_master_0.mosi_word[7:0]
+@28
+test_spi_master_slave.spi_master_0.mosi_word[7:0]
+@22
+test_spi_master_slave.spi_master_0.miso_word[7:0]
+@28
+test_spi_master_slave.spi_master_0.miso_word[7:0]
+test_spi_master_slave.spi_master_0.miso_valid
+@22
+test_spi_master_slave.spi_master_0.state[1:0]
+test_spi_master_slave.spi_master_0.cycle[2:0]
+@200
+-
+-SPI Bus
+@28
+test_spi_master_slave.spi_master_0.ssel
+test_spi_master_slave.spi_master_0.sclk
+test_spi_master_slave.spi_slave_0.mosi
+(0)test_spi_master_slave.spi_slave_0.miso_word[7:0]
+@200
+-
+-Slave
+@22
+test_spi_master_slave.spi_slave_0.mosi_word[7:0]
+@28
+test_spi_master_slave.spi_slave_0.mosi_word[7:0]
+test_spi_master_slave.spi_slave_0.mosi_valid
+@22
+test_spi_master_slave.spi_slave_0.miso_word_in[7:0]
+@28
+test_spi_master_slave.spi_slave_0.miso_accepted
+@22
+test_spi_master_slave.spi_slave_0.miso_word[7:0]
+@28
+test_spi_master_slave.spi_slave_0.miso_word[7:0]
+test_spi_master_slave.spi_slave_0.prev_sclk
+@c00022
+test_spi_master_slave.spi_slave_0.state[1:0]
+@28
+(0)test_spi_master_slave.spi_slave_0.state[1:0]
+(1)test_spi_master_slave.spi_slave_0.state[1:0]
+@1401200
+-group_end
+@22
+test_spi_master_slave.spi_slave_0.cycle[2:0]
+@29
+test_spi_master_slave.spi_slave_0.skip
+[pattern_trace] 1
+[pattern_trace] 0

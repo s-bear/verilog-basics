@@ -1,0 +1,44 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Fri Mar 29 01:41:40 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_spi_master.fst"
+[dumpfile_mtime] "Fri Mar 29 01:40:21 2019"
+[dumpfile_size] 1228
+[savefile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_spi_master.gtkw"
+[timestart] 0
+[size] 1207 653
+[pos] 732 69
+*-15.992552 25000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_spi_master.
+[sst_width] 189
+[signals_width] 157
+[sst_expanded] 1
+[sst_vpaned_height] 179
+@28
+test_spi_master.clk
+test_spi_master.reset
+test_spi_master.transfer
+test_spi_master.mosi_accepted
+@22
+test_spi_master.bit_in[2:0]
+@28
+test_spi_master.mosi_word_in[7:0]
+@29
+test_spi_master.ss
+@28
+test_spi_master.sclk
+test_spi_master.mosi
+test_spi_master.miso
+test_spi_master.miso_valid
+@22
+test_spi_master.miso_word[7:0]
+@200
+-
+@28
+test_spi_master.spi_master_0.state[1:0]
+test_spi_master.spi_master_0.timer[1:0]
+test_spi_master.spi_master_0.miso_bit[2:0]
+test_spi_master.spi_master_0.mosi_bit[2:0]
+[pattern_trace] 1
+[pattern_trace] 0

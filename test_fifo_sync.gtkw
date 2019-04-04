@@ -1,0 +1,42 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Thu Apr  4 06:48:32 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_fifo_sync.fst"
+[dumpfile_mtime] "Thu Apr  4 06:46:43 2019"
+[dumpfile_size] 1362
+[savefile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_fifo_sync.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -1 -1
+*-16.276798 1080000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_fifo_sync.
+[sst_width] 189
+[signals_width] 153
+[sst_expanded] 1
+[sst_vpaned_height] 307
+@28
+test_fifo_sync.clk
+test_fifo_sync.reset
+@200
+-
+@28
+test_fifo_sync.write_en
+@22
+test_fifo_sync.write_data[7:0]
+@28
+test_fifo_sync.fifo_0.fifo_full
+@22
+test_fifo_sync.fifo_0.write_addr[3:0]
+@200
+-
+@28
+test_fifo_sync.read_en
+@22
+test_fifo_sync.fifo_0.read_data[7:0]
+@28
+test_fifo_sync.fifo_0.fifo_empty
+@22
+test_fifo_sync.fifo_0.read_addr[3:0]
+[pattern_trace] 1
+[pattern_trace] 0
