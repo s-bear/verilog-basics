@@ -109,8 +109,8 @@ spi_master #(
     .MISO_PHA(MISO_PHA), // 0 or 1 -- if 0, MISO shifts in on the lagging sclk edge
     .MSB_FIRST(MSB_FIRST), // 0 or 1 -- if 0, shift the LSB in/out first
     .TimerWidth(4), // bits for the sclk timer -- enough to count to T_sclk
-    .T_sclk(6),     // sclk period, in clk tick counts. must be at least 2
-    .T_sclk_cpol(3) // sclk time in the CPOL phase. must be at least 1
+    .T_sclk(16),     // sclk period, in clk tick counts. must be at least 2
+    .T_sclk_cpol(8) // sclk time in the CPOL phase. must be at least 1
 ) spi_master_0 (
     .clk(clk),   // system clock
     .reset(reset), // system reset
