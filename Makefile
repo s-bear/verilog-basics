@@ -6,6 +6,7 @@ V_FILES = $(wildcard *.v)
 TEST_FILES = $(filter test% %_tb.v,$(V_FILES))
 SRC_FILES = $(filter-out test% %_tb.v,$(V_FILES))
 
+
 VC = iverilog
 VCFLAGS = -v -y. -Wall
 CHECKFLAGS = -y. -Wall
@@ -18,7 +19,7 @@ SIMARGS = -fst
 TEST_OUT_FILES = $(addsuffix .vvp,$(basename $(TEST_FILES)))
 SIM_LOG_FILES = $(addsuffix .log,$(basename $(TEST_FILES)))
 
-.PHONY: check sim
+.PHONY: check sim clean
 
 check: $(V_FILES)
 	for tb in $(TEST_FILES); do \
@@ -26,6 +27,9 @@ check: $(V_FILES)
 	done
 
 sim: $(SIM_LOG_FILES)
+
+clean: 
+	rm -f *.vvp *.log *.fst
 
 #this rule for building test benches assumes that the test benches
 # do not depend on each other
