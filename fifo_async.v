@@ -8,10 +8,14 @@ Asynchronous FIFO queue, based on the design presented in "Simulation and
  Synthesis Techniques for Asynchronous FIFO Design" by Clifford E Cummings,
  Sunburst Design, Inc. 
 
+This FIFO uses First-Word Fall-Through (FWFT) semantics--meaning that the first
+word of data pushed into the queue appears on read_data *before* read_en is
+asserted. That is, when and only when fifo_empty == 1'b0, read_data is valid.
+
 This FIFO design uses gray code to pass the read and write pointers across clock
 boundaries, improving synchronizer performance. The fifo_full and fifo_empty
 signals are asserted immediately but remove pessimisticly -- so there is no
-chance for errors. 
+chance for errors.
 
 NOTE: write_reset and read_reset should be asserted simultaneously, but 
 synchronized to their respective clocks for the FIFO to behave as expected.
@@ -43,37 +47,6 @@ fifo_async #(
 );
 */
 
-module synchronizer #(
-    parameter Width = 8,
-    parameter Stages = 2,
-    parameter Init = 0,
-    parameter InitValue = 0
-) (
-    input wire clk,
-    input wire reset,
-    input wire [Width-1:0] in,
-    output wire [Width-1:0] out
-);
-generate
-if(Stages == 0) begin
-    assign out = in;
-end else begin
-    reg [Width*Stages-1:0] shiftreg;
-    assign out = shiftreg[Width-1:0];
-    always @(posedge clk or posedge reset) begin
-        if(reset == 1'b1) begin
-            shiftreg <= 0;
-        end else begin
-            shiftreg <= {in, shiftreg[Width*Stages-1:Width]};
-        end
-    end
-    if(Init != 0) initial begin
-        shiftreg = {Stages{InitValue[Width-1:0]}};
-    end
-end
-endgenerate
-endmodule
-
 module fifo_async #(
     parameter DataWidth = 16,
     parameter DataDepth = 1024,
@@ -91,7 +64,7 @@ module fifo_async #(
     input wire read_clk,
     input wire read_reset,
     input wire read_en,
-    output reg [DataWidth-1:0] read_data,
+    output wire [DataWidth-1:0] read_data,
     output reg fifo_empty
 );
 
@@ -99,9 +72,6 @@ function [AddrWidth:0] bin_to_gray;
     input [AddrWidth:0] bin;
     bin_to_gray = {bin[AddrWidth], bin[AddrWidth:1] ^ bin[AddrWidth-1:0]};
 endfunction
-
-//memory
-reg [DataWidth-1:0] mem [DataDepth-1:0];
 
 /* WRITE SIDE VARIABLES */
 //address registers have an extra bit to deal with wrap-around
@@ -111,6 +81,8 @@ reg [AddrWidth:0] write_addr_gray, write_addr_gray_D;
 wire [AddrWidth:0] read_addr_gray_sync;
 reg fifo_full_D;
 
+wire write_en_not_full = (write_en == 1'b1 && fifo_full == 1'b0);
+
 /* READ SIDE VARIABLES */
 //address registers have an extra bit to deal with wrap-around
 //this simplifies full/empty logic
@@ -119,10 +91,32 @@ reg [AddrWidth:0] read_addr_gray, read_addr_gray_D;
 wire [AddrWidth:0] write_addr_gray_sync;
 reg fifo_empty_D;
 
+wire read_en_not_empty = (read_en == 1'b1 && fifo_empty == 1'b0);
+
+/* MEMORY */
+// you can replace this with another dual-port memory as long as the read/write
+// semantics stay the same (single clock cycle accesses)
+ram_dp #(
+    .DataWidth(DataWidth),    // word size, in bits
+    .DataDepth(DataDepth), // RAM size, in words
+    .AddrWidth(AddrWidth),   // enough bits for DataDepth
+    .InitFile(InitFile),    // initialize using $readmemh if InitCount > 0
+    .InitValue(0),    // initialize to value if InitFile == "" and InitCount > 0
+    .InitCount(InitCount)    // number of words to init using InitFile or InitValue
+) mem (
+    .write_clk(write_clk),  // in: write domain clock
+    .write_en(write_en_not_full),   // in: write enable
+    .write_addr(write_addr[AddrWidth-1:0]), // in [AddrWidth]: write address
+    .write_data(write_data), // in [DataWidth]: written on posedge write_clk when write_en == 1
+    .read_clk(read_clk),   // in: read domain clock
+    .read_en(1'b1),    // in: read enable
+    .read_addr(read_addr_D[AddrWidth-1:0]),  // in [AddrWidth]: read address
+    .read_data(read_data)   // out [DataWidth]: registered on posedge read_clk when read_en == 1
+);
+
 //initialize memory from file. NOTE: clobbered by write_reset!
 generate
 if(InitCount > 0) initial begin
-    $readmemh(InitFile, mem, 0, InitCount-1);
     write_addr = InitCount;
     write_addr_gray = bin_to_gray(InitCount);
     read_addr = 0;
@@ -161,7 +155,7 @@ synchronizer #(
 always @* begin
     //write logic
     write_addr_D = write_addr;
-    if(write_en == 1'b1 && fifo_full == 1'b0) begin
+    if(write_en_not_full) begin
         write_addr_D = write_addr + 1;
     end
 
@@ -174,7 +168,7 @@ always @* begin
 
     //read logic
     read_addr_D = read_addr;
-    if(read_en == 1'b1 && fifo_empty == 1'b0) begin
+    if(read_en_not_empty) begin
         read_addr_D = read_addr + 1;
     end
 
@@ -194,10 +188,6 @@ always @(posedge write_clk or posedge write_reset) begin
         write_addr <= write_addr_D;
         write_addr_gray <= write_addr_gray_D;
         fifo_full <= fifo_full_D;
-        if(write_en == 1'b1 && fifo_full == 1'b0) begin
-            //exclude the extra address bit when writing to the memory!
-            mem[write_addr[AddrWidth-1:0]] <= write_data;
-        end
     end
 end
 
@@ -207,13 +197,10 @@ always @(posedge read_clk or posedge read_reset) begin
         read_addr <= 0;
         read_addr_gray <= 0;
         fifo_empty <= 1'b1;
-        read_data <= 0;
     end else begin
         read_addr <= read_addr_D;
         read_addr_gray <= read_addr_gray_D;
         fifo_empty <= fifo_empty_D;
-        //always read
-        read_data <= mem[read_addr_D[AddrWidth-1:0]];
     end
 end
 

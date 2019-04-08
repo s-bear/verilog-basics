@@ -8,6 +8,10 @@ Synchronous FIFO queue.
 Ignores reads when empty.
 Ignores writes when full _unless_ simultaneously reading while not empty.
 
+This FIFO uses First-Word Fall-Through (FWFT) semantics--meaning that the first
+word of data pushed into the queue appears on read_data *before* read_en is
+asserted. That is, when and only when fifo_empty == 1'b0, read_data is valid.
+
 Parameters InitFile and InitCount may be used to give the FIFO an initial state.
 This feature might not be supported by synthesis tools, but is useful for
 simulation. Be aware that reset will *not* return the FIFO to this initial
@@ -46,12 +50,9 @@ module fifo_sync #(
     output reg fifo_full,
     //read interface
     input wire read_en,
-    output reg [DataWidth-1:0] read_data,
+    output wire [DataWidth-1:0] read_data,
     output reg fifo_empty
 );
-
-//memory
-reg [DataWidth-1:0] mem [DataDepth-1:0];
 
 //addressing
 reg [AddrWidth-1:0] write_addr, write_addr_D;
@@ -62,10 +63,29 @@ reg do_write, fifo_full_D, fifo_empty_D;
 wire [AddrWidth-1:0] next_write_addr = (write_addr + 1) % DataDepth;
 wire [AddrWidth-1:0] next_read_addr = (read_addr + 1) % DataDepth;
 
+//memory
+//you can replace this with another ram as long as it's single-clock access
+ram_dp #(
+    .DataWidth(DataWidth),    // word size, in bits
+    .DataDepth(DataDepth), // RAM size, in words
+    .AddrWidth(AddrWidth),   // enough bits for DataDepth
+    .InitFile(InitFile),    // initialize using $readmemh if InitCount > 0
+    .InitValue(0),    // initialize to value if InitFile == "" and InitCount > 0
+    .InitCount(InitCount)    // number of words to init using InitFile or InitValue
+) mem (
+    .write_clk(clk),  // in: write domain clock
+    .write_en(do_write),   // in: write enable
+    .write_addr(write_addr), // in [AddrWidth]: write address
+    .write_data(write_data), // in [DataWidth]: written on posedge write_clk when write_en == 1
+    .read_clk(clk),   // in: read domain clock
+    .read_en(1'b1),    // in: read enable
+    .read_addr(read_addr_D),  // in [AddrWidth]: read address
+    .read_data(read_data)   // out [DataWidth]: registered on posedge read_clk when read_en == 1
+);
+
 //init from file. n.b. clobbered by reset!
 generate
 if(InitCount > 0) initial begin
-    $readmemh(InitFile, mem, 0, InitCount-1);
     write_addr = InitCount % DataDepth;
     read_addr  = 0;
     fifo_full  = (InitCount == DataDepth);
@@ -119,7 +139,6 @@ always @(posedge clk) begin
         read_addr <= 0;
         fifo_full <= 1'b0;
         fifo_empty <= 1'b1;
-        read_data <= 0;
         first_write <= 1'b1;
     end else begin 
         write_addr <= write_addr_D;
@@ -127,11 +146,6 @@ always @(posedge clk) begin
         fifo_full <= fifo_full_D;
         fifo_empty <= fifo_empty_D;
         first_write <= first_write_D;
-        if(do_write == 1'b1) begin
-            mem[write_addr] <= write_data;
-        end
-        //always read:
-        read_data <= mem[read_addr_D];
     end
 end
 
