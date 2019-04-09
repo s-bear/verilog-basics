@@ -1,0 +1,37 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Tue Apr  9 05:31:46 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/verilog-basics/test_lfsr.fst"
+[dumpfile_mtime] "Tue Apr  9 05:23:02 2019"
+[dumpfile_size] 1596
+[savefile] "/mnt/c/Users/uqspowe6/source/verilog-basics/test_lfsr.gtkw"
+[timestart] 2323200
+[size] 1920 1017
+[pos] -243 -243
+*-16.083183 2590000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_lfsr.
+[sst_width] 189
+[signals_width] 146
+[sst_expanded] 1
+[sst_vpaned_height] 307
+@28
+test_lfsr.clk
+test_lfsr.reset
+test_lfsr.enable
+test_lfsr.out
+@c00022
+test_lfsr.lfsr_0.state[7:0]
+@28
+(0)test_lfsr.lfsr_0.state[7:0]
+(1)test_lfsr.lfsr_0.state[7:0]
+(2)test_lfsr.lfsr_0.state[7:0]
+(3)test_lfsr.lfsr_0.state[7:0]
+(4)test_lfsr.lfsr_0.state[7:0]
+(5)test_lfsr.lfsr_0.state[7:0]
+(6)test_lfsr.lfsr_0.state[7:0]
+(7)test_lfsr.lfsr_0.state[7:0]
+@1401200
+-group_end
+[pattern_trace] 1
+[pattern_trace] 0
