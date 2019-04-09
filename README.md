@@ -23,5 +23,3 @@ up to run all of the tests using `iverilog` and `vvp`.
 
 - `synchronizer.v` Shift register for synchronizing across clock domains
 - `lfsr.v` Linear-feedback shift register for pseudorandom bit streams
-
-As well as test for each and a Makefile for running said tests using `iverilog` and `vvp`.
