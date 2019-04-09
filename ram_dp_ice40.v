@@ -10,11 +10,11 @@ DataWidth *must* be a power of 2 and <= 16
 TODO: add support for InitValue?
 
 ram_dp_ice40 #(
-    .DataWidth(8),
+    .DataWidth(8), //MUST BE ONE OF 1, 2, 4, 8, 16
     .DataDepth(1024),
     .AddrWidth(10),
     .MaskEnable(0),
-    .Debug(0) //use ram_dp_generic instead of SB_RAM256x16 for testing
+    .Debug(0) //nonzero: use ram_dp_generic instead of SB_RAM256x16
 ) ram_dp_ice40_0 (
     .write_clk(), // in 
     .write_en(), // in 
@@ -71,45 +71,52 @@ endfunction
 //how many RAMs do we need?
 localparam NumRAMs = cdiv(DataWidth*DataDepth, 4096);
 //how many bits of the address are used within each 16-bit word?
-localparam WordIdxWidth = clog2(16) - clog2(DataWidth);
+localparam WordIdxWidth = (DataWidth >= 16) ? 1 : clog2(16) - clog2(DataWidth);
 //how many bits of the address are used to select each RAM?
-localparam RamIdxWidth = clog2(NumRAMs);
+localparam RamIdxWidth = (NumRAMs == 1) ? 1 : clog2(NumRAMs);
 localparam RamIdxBit = WordIdxWidth + 8;
-
-
-genvar i;
-generate
 
 //wires connected to the array of RAMs
 wire [15:0] rdata_mux [0:NumRAMs-1];
-reg [15:0] rdata, wdata, mask;
+wire [15:0] rdata;
+reg [15:0] wdata, mask;
 reg [7:0] raddr, waddr;
 reg [NumRAMs-1:0] we, re;
 
+wire [RamIdxWidth-1:0] write_ram_idx;
+wire [WordIdxWidth-1:0] write_word_idx;
+reg [RamIdxWidth-1:0] read_ram_idx, read_ram_idx_D;
+reg [WordIdxWidth-1:0] read_word_idx, read_word_idx_D;
+
+generate
 //pull the ram index out of the upper address bits
 if(NumRAMs == 1) begin
-    wire write_ram_idx = 1'b0;
-    wire read_ram_idx = 1'b0;
+    assign write_ram_idx = 1'b0;
 end else begin
-    wire [RamIdxWidth-1:0] write_ram_idx = write_addr[RamIdxBit +: RamIdxWidth];
-    wire [RamIdxWidth-1:0] read_ram_idx = read_addr[RamIdxBit +: RamIdxWidth];
+    assign write_ram_idx = write_addr[RamIdxBit +: RamIdxWidth];
 end
 //pull the word index out of the lower address bits
-if(WordIdxWidth == 0) begin
-    wire write_word_idx = 1'b0;
-    wire read_word_idx = 1'b0;
+if(DataWidth == 16) begin
+    assign write_word_idx = 1'b0;
 end else begin
-    wire [WordIdxWidth-1:0] write_word_idx = write_addr[0 +: WordIdxWidth];
-    wire [WordIdxWidth-1:0] read_word_idx = read_addr[0 +: WordIdxWidth];
+    assign write_word_idx = write_addr[0 +: WordIdxWidth];
 end
+endgenerate
+
+assign rdata = rdata_mux[read_ram_idx];
 
 always @* begin
+    //read indices
+    if(NumRAMs == 1) read_ram_idx_D = 1'b0;
+    else read_ram_idx_D = read_addr[RamIdxBit +: RamIdxWidth];
+    if(DataWidth == 16) read_word_idx_D = 1'b0;
+    else read_word_idx_D = read_addr[0 +: WordIdxWidth];
+
     //select the RAM
     we = 0;
     re = 0;
     we[write_ram_idx] = write_en;
-    re[read_ram_idx] = read_en;
-    rdata = rdata_mux[read_ram_idx];
+    re[read_ram_idx_D] = read_en;
     
     //select the address bits
     raddr = read_addr[WordIdxWidth +: 8];
@@ -117,17 +124,25 @@ always @* begin
 
     //write mask
     if(MaskEnable == 0)
-        mask = ~({WordIdxWidth{1'b1}} << write_word_idx);
+        mask = ~({DataWidth{1'b1}} << DataWidth*write_word_idx);
     else
-        mask = ~(({WordIdxWidth{1'b1}} & ~write_mask) << write_word_idx);
+        mask = ~(({DataWidth{1'b1}} & ~write_mask) << DataWidth*write_word_idx);
     
     //select words
     wdata = 0;
     wdata[write_word_idx*DataWidth +: DataWidth] = write_data;
     read_data = rdata[read_word_idx*DataWidth +: DataWidth];
+
+end
+
+always @(posedge read_clk) begin
+    read_ram_idx <= read_ram_idx_D;
+    read_word_idx <= read_word_idx_D;
 end
 
 //generate RAMs
+genvar i;
+generate
 for(i = 0; i < NumRAMs; i = i + 1) begin : rams
     if(Debug == 0) begin
         SB_RAM256x16 ram_i (
@@ -150,7 +165,7 @@ for(i = 0; i < NumRAMs; i = i + 1) begin : rams
             .AddrWidth(8),   // enough bits for DataDepth
             .MaskEnable(1),   // enable write_mask if non-zero
             .InitFile(""),    // initialize using $readmemh if InitCount > 0
-            .InitValue(16'hACDC),    // initialize to value if InitFile == "" and InitCount > 0
+            .InitValue(16'h0000),    // initialize to value if InitFile == "" and InitCount > 0
             .InitCount(256)    // number of words to init using InitFile or InitValue
         ) ram_dp_generic_0 (
             .write_clk(write_clk),  // in: write domain clock

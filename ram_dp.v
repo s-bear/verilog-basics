@@ -20,7 +20,8 @@ ram_dp #(
     .InitFile(""),    // initialize using $readmemh if InitCount > 0
     .InitValue(0),    // initialize to value if InitFile == "" and InitCount > 0
     .InitCount(0),    // number of words to init using InitFile or InitValue
-    .VendorImpl("")   // Vendor-specific RAM primitives
+    .VendorImpl(""),  // Vendor-specific RAM primitives
+    .VendorDebug(0)   // For testing the connections to vendor-specific primitives
 ) ram_dp_0 (
     .write_clk(),  // in: write domain clock
     .write_en(),   // in: write enable
@@ -41,7 +42,8 @@ module ram_dp #(
     parameter InitFile = "",
     parameter InitValue = 0,
     parameter InitCount = 0,
-    parameter VendorImpl = ""
+    parameter VendorImpl = "",
+    parameter VendorDebug = 0
 ) (
     //write
     input wire write_clk,
@@ -53,17 +55,19 @@ module ram_dp #(
     input wire read_clk,
     input wire read_en,
     input wire [AddrWidth-1:0] read_addr,
-    output reg [DataWidth-1:0] read_data
+    output wire [DataWidth-1:0] read_data
 );
 
 generate
 case(VendorImpl)
 "ICE40": //Lattice SB_RAM256x16
+
     ram_dp_ice40 #(
         .DataWidth(DataWidth),
         .DataDepth(DataDepth),
         .AddrWidth(AddrWidth),
-        .MaskEnable(MaskEnable)
+        .MaskEnable(MaskEnable),
+        .Debug(VendorDebug)
     ) ram_dp_ice40_0 (
         .write_clk(write_clk), // in 
         .write_en(write_en), // in 

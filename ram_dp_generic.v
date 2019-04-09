@@ -74,12 +74,14 @@ if(MaskEnable == 0) begin
         if(write_en == 1'b1) mem[write_addr] <= write_data;
     end
 end else begin //MaskEnable
-    if(write_en == 1'b1) begin
-        //this probably won't synthesize correctly to an inferred BRAM because
-        //it reads before writing, but without using the read-port (which is
-        //in a different clock domain here!)
-        //it *might* synthesize correctly if write_clk == read_clk
-        mem[write_addr] <= (mem[write_addr] & write_mask) | (write_data & ~write_mask);
+    always @(posedge write_clk) begin
+        if(write_en == 1'b1) begin
+            //this probably won't synthesize correctly to an inferred BRAM because
+            //it reads before writing, but without using the read-port (which is
+            //in a different clock domain here!)
+            //it *might* synthesize correctly if write_clk == read_clk
+            mem[write_addr] <= (mem[write_addr] & write_mask) | (write_data & ~write_mask);
+        end
     end
 end
 endgenerate
