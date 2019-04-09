@@ -31,7 +31,8 @@ fifo_async #(
     .AddrWidth(10),   // memory address size, in bits
     .SyncStages(2),   // number of synchronizer stages between clock domains
     .InitFile(""),    // read using $readmemh if InitCount > 0
-    .InitCount(0)     // number of words to read from InitFile, <= DataDepth
+    .InitCount(0),    // number of words to read from InitFile, <= DataDepth
+    .VendorImpl("")   // vendor specific RAM primitive -- see ram_dp.v
 ) fifo_async_0 (
     .write_clk(),   // in: write domain clock
     .write_reset(), // in: write domain reset
@@ -53,7 +54,8 @@ module fifo_async #(
     parameter AddrWidth = 10,
     parameter SyncStages = 2,
     parameter InitFile = "",
-    parameter InitCount = 0
+    parameter InitCount = 0,
+    parameter VendorImpl = ""
 ) (
     input wire write_clk,
     input wire write_reset,
@@ -102,7 +104,8 @@ ram_dp #(
     .AddrWidth(AddrWidth),   // enough bits for DataDepth
     .InitFile(InitFile),    // initialize using $readmemh if InitCount > 0
     .InitValue(0),    // initialize to value if InitFile == "" and InitCount > 0
-    .InitCount(InitCount)    // number of words to init using InitFile or InitValue
+    .InitCount(InitCount),    // number of words to init using InitFile or InitValue
+    .VendorImpl(VendorImpl)
 ) mem (
     .write_clk(write_clk),  // in: write domain clock
     .write_en(write_en_not_full),   // in: write enable

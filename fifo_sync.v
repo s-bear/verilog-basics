@@ -22,7 +22,8 @@ fifo_sync #(
     .DataDepth(1024),
     .AddrWidth(10),
     .InitFile(""), //read using $readmemh if InitCount > 0
-    .InitCount(0) //number of words to read from InitFile, <= DataDepth
+    .InitCount(0), //number of words to read from InitFile, <= DataDepth
+    .VendorImpl("")  // Vendor-specific RAM primitives -- see ram_dp.v
 ) fifo_sync_0 (
     .clk(),   //system clock
     .reset(), //system reset
@@ -40,7 +41,8 @@ module fifo_sync #(
     parameter DataDepth = 1024,
     parameter AddrWidth = 10,
     parameter InitFile = "",
-    parameter InitCount = 0
+    parameter InitCount = 0,
+    parameter VendorImpl = ""
 )(
     input wire clk,
     input wire reset,
@@ -71,7 +73,8 @@ ram_dp #(
     .AddrWidth(AddrWidth),   // enough bits for DataDepth
     .InitFile(InitFile),    // initialize using $readmemh if InitCount > 0
     .InitValue(0),    // initialize to value if InitFile == "" and InitCount > 0
-    .InitCount(InitCount)    // number of words to init using InitFile or InitValue
+    .InitCount(InitCount),    // number of words to init using InitFile or InitValue
+    .VendorImpl(VendorImpl)
 ) mem (
     .write_clk(clk),  // in: write domain clock
     .write_en(do_write),   // in: write enable
