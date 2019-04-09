@@ -1,15 +1,15 @@
 
 #list verilog files, separate into test and src files
 #two patterns are included for matching test files: test% and %_tb.v
+
 V_FILES = $(wildcard *.v)
-#V_FILES = test_spi.v spi_master.v
 TEST_FILES = $(filter test% %_tb.v,$(V_FILES))
 SRC_FILES = $(filter-out test% %_tb.v,$(V_FILES))
-
+MODULE_DIRS = ..
 
 VC = iverilog
-VCFLAGS = -v -y. -Wall
-CHECKFLAGS = -y. -Wall
+VCFLAGS = -v -Wall $(addprefix -y,$(MODULE_DIRS))
+CHECKFLAGS = -Wall $(addprefix -y,$(MODULE_DIRS))
 
 SIM = vvp
 SIMFLAGS = -v
