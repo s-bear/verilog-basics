@@ -14,6 +14,7 @@ ram_dp_ice40 #(
     .DataDepth(1024),
     .AddrWidth(10),
     .MaskEnable(0),
+    .InitValue(8'h00),
     .Debug(0) //nonzero: use ram_dp_generic instead of SB_RAM256x16
 ) ram_dp_ice40_0 (
     .write_clk(), // in 
@@ -35,6 +36,7 @@ module ram_dp_ice40 #(
     parameter DataDepth = 1024,
     parameter AddrWidth = 10,
     parameter MaskEnable = 0,
+    parameter InitValue = 8'h00,
     parameter Debug = 0
 ) (
     //write
@@ -75,6 +77,8 @@ localparam WordIdxWidth = (DataWidth >= 16) ? 1 : clog2(16) - clog2(DataWidth);
 //how many bits of the address are used to select each RAM?
 localparam RamIdxWidth = (NumRAMs == 1) ? 1 : clog2(NumRAMs);
 localparam RamIdxBit = WordIdxWidth + 8;
+
+localparam InitString = {(256/DataWidth){InitValue[DataWidth-1:0]}};
 
 //wires connected to the array of RAMs
 wire [15:0] rdata_mux [0:NumRAMs-1];
@@ -145,7 +149,24 @@ genvar i;
 generate
 for(i = 0; i < NumRAMs; i = i + 1) begin : rams
     if(Debug == 0) begin
-        SB_RAM256x16 ram_i (
+        SB_RAM256x16 #(
+            .INIT_0(InitString),
+            .INIT_1(InitString),
+            .INIT_2(InitString),
+            .INIT_3(InitString),
+            .INIT_4(InitString),
+            .INIT_5(InitString),
+            .INIT_6(InitString),
+            .INIT_7(InitString),
+            .INIT_8(InitString),
+            .INIT_9(InitString),
+            .INIT_A(InitString),
+            .INIT_B(InitString),
+            .INIT_C(InitString),
+            .INIT_D(InitString),
+            .INIT_E(InitString),
+            .INIT_F(InitString)
+        ) ram_i (
             .RDATA(rdata_mux[i]),
             .RADDR(raddr),
             .RCLK(read_clk),
@@ -165,7 +186,7 @@ for(i = 0; i < NumRAMs; i = i + 1) begin : rams
             .AddrWidth(8),   // enough bits for DataDepth
             .MaskEnable(1),   // enable write_mask if non-zero
             .InitFile(""),    // initialize using $readmemh if InitCount > 0
-            .InitValue(16'h0000),    // initialize to value if InitFile == "" and InitCount > 0
+            .InitValue(InitString[15:0]),    // initialize to value if InitFile == "" and InitCount > 0
             .InitCount(256)    // number of words to init using InitFile or InitValue
         ) ram_dp_generic_0 (
             .write_clk(write_clk),  // in: write domain clock

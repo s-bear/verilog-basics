@@ -7,9 +7,14 @@ samuel.powell@uq.edu.au
 Dual-port RAM with asynchronous clocks. Read and write ports are the same width.
 Bit-level write-masking is optional, but is perhaps not synthesizable as coded here.
 
-Generic and vendor-specific implementations:
-"ICE40" -- use Lattice SB_RAM256x16 as the basis for the RAM. InitFile not supported.
-anything else -- use generic verilog
+VendorImpl options:
+"ICE40":
+    Lattice iCE40 SB_RAM256x16 is used as the basis for the RAM.
+    InitFile and InitCount are not supported. The RAM is always inititialized
+    using InitValue.
+"":
+    A generic Verilog RAM implementation is used. Some synthesizers might not
+    support write masking or initialization features.
 
 
 ram_dp #(
@@ -67,6 +72,7 @@ case(VendorImpl)
         .DataDepth(DataDepth),
         .AddrWidth(AddrWidth),
         .MaskEnable(MaskEnable),
+        .InitValue(InitValue),
         .Debug(VendorDebug)
     ) ram_dp_ice40_0 (
         .write_clk(write_clk), // in 
