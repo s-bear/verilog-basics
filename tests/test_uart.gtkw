@@ -1,0 +1,46 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Fri Apr 12 09:16:37 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/verilog-basics/tests/test_uart.fst"
+[dumpfile_mtime] "Fri Apr 12 09:13:51 2019"
+[dumpfile_size] 1222
+[savefile] "/mnt/c/Users/uqspowe6/source/verilog-basics/tests/test_uart.gtkw"
+[timestart] 0
+[size] 1489 792
+[pos] -1 -1
+*-16.841990 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_uart.
+[sst_width] 189
+[signals_width] 102
+[sst_expanded] 1
+[sst_vpaned_height] 228
+@28
+test_uart.clk
+test_uart.reset
+@200
+-
+@28
+test_uart.rx_enable
+@22
+test_uart.rx_word[7:0]
+@28
+test_uart.rx_done
+test_uart.rx_error
+@200
+-
+@28
+test_uart.tx_start
+@22
+test_uart.tx_word[7:0]
+@28
+test_uart.tx_success
+@200
+-
+@28
+test_uart.rtr_n
+test_uart.cts_n
+test_uart.rxd
+test_uart.txd
+[pattern_trace] 1
+[pattern_trace] 0
