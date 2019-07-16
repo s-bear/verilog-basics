@@ -59,10 +59,13 @@ generate
 if(InitCount > 0) begin
     integer i;
     initial begin
-        for(i = 0; i < InitCount && i < DataDepth; i = i + 1)
-            mem[i] = InitValue[DataWidth-1:0];
-        if(InitFile != "")
+        if(InitFile != "") begin
             $readmemh(InitFile, mem, 0, InitCount-1);
+        end else begin
+            for(i = 0; i < InitCount && i < DataDepth; i = i + 1)
+                mem[i] = InitValue[DataWidth-1:0];
+        end
+        read_data <= mem[0];
     end
 end
 endgenerate
