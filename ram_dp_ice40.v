@@ -52,23 +52,7 @@ module ram_dp_ice40 #(
     output reg [DataWidth-1:0] read_data
 );
 
-//ceiling divide
-function integer cdiv;
-    input integer a, b;
-    begin
-        cdiv = a/b;
-        if(cdiv*b < a) cdiv = cdiv + 1;
-    end
-endfunction
-
-//ceil(log2(a))
-function integer clog2;
-    input integer a;
-    begin
-        a = a-1;
-        for(clog2=0; a >0; clog2 = clog2+1) a = a >> 1;
-    end
-endfunction
+`include "functions.vh"
 
 //how many RAMs do we need?
 localparam NumRAMs = cdiv(DataWidth*DataDepth, 4096);
@@ -77,6 +61,7 @@ localparam WordIdxWidth = (DataWidth >= 16) ? 1 : clog2(16) - clog2(DataWidth);
 //how many bits of the address are used to select each RAM?
 localparam RamIdxWidth = (NumRAMs == 1) ? 1 : clog2(NumRAMs);
 localparam RamIdxBit = WordIdxWidth + 8;
+localparam RamAddrWidth = AddrWidth - (clog2(16) - clog2(DataWidth)) - clog2(NumRAMs);
 
 localparam InitString = {(256/DataWidth){InitValue[DataWidth-1:0]}};
 
@@ -123,9 +108,13 @@ always @* begin
     re[read_ram_idx_D] = read_en;
     
     //select the address bits
-    raddr = read_addr[WordIdxWidth +: 8];
-    waddr = write_addr[WordIdxWidth +: 8];
-
+    if(DataWidth == 16) begin
+        raddr = {{8-RamAddrWidth{1'b0}},read_addr[0 +: RamAddrWidth]};
+        waddr = {{8-RamAddrWidth{1'b0}},write_addr[0 +: RamAddrWidth]};
+    end else begin
+        raddr = {{8-RamAddrWidth{1'b0}},read_addr[WordIdxWidth +: RamAddrWidth]};
+        waddr = {{8-RamAddrWidth{1'b0}},write_addr[WordIdxWidth +: RamAddrWidth]};
+    end
     //write mask
     if(MaskEnable == 0)
         mask = ~({DataWidth{1'b1}} << DataWidth*write_word_idx);
