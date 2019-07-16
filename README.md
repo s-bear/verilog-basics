@@ -27,3 +27,9 @@ up to run all of the tests using `iverilog` and `vvp`.
 - `pwm.v` Pulse-width modulation, including a spread-spectrum mode
 - `synchronizer.v` Shift register for synchronizing across clock domains
 - `lfsr.v` Linear-feedback shift register for pseudorandom bit streams
+
+# TO DO
+ [ ] test_debounce.v
+ [ ] hardware testing of uart.v -- had some issues with iCE40 at 5 MHz, 19200 baud before adding resynchronization code.
+ [ ] is ram_dp_ice40.v necessary?? Does it do anything the synthesis tools don't do automatically?
+ [ ] report on hardware testing, synthesis info, etc?
