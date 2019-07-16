@@ -64,6 +64,7 @@ reg do_write, fifo_full_D, fifo_empty_D;
 
 wire [AddrWidth-1:0] next_write_addr = (write_addr + 1) % DataDepth;
 wire [AddrWidth-1:0] next_read_addr = (read_addr + 1) % DataDepth;
+wire do_read = (read_en & ~fifo_empty) | (~first_write & fifo_empty);
 
 //memory
 //you can replace this with another ram as long as it's single-clock access
@@ -81,7 +82,7 @@ ram_dp #(
     .write_addr(write_addr), // in [AddrWidth]: write address
     .write_data(write_data), // in [DataWidth]: written on posedge write_clk when write_en == 1
     .read_clk(clk),   // in: read domain clock
-    .read_en(1'b1),    // in: read enable
+    .read_en(do_read),    // in: read enable
     .read_addr(read_addr_D),  // in [AddrWidth]: read address
     .read_data(read_data)   // out [DataWidth]: registered on posedge read_clk when read_en == 1
 );
