@@ -9,20 +9,18 @@ options. Most notably, MISO and MOSI may have different phases.
 
 spi_master #(
     .WordWidth(8),  // bits per word
-    .IndexWidth(3), // ceil(log2(WordWidth))
     .SPOL(0),    // 0 or 1 -- if 0, SSEL is active low (typical)
     .CPOL(0),     // 0 or 1 -- sclk phase
     .MOSI_PHA(0), // 0 or 1 -- if 0, MOSI shifts out on the leading sclk edge
     .MISO_PHA(0), // 0 or 1 -- if 0, MISO shifts in on the lagging sclk edge
     .MSB_FIRST(1), // if nonzero, shift the MSb in/out first
-    .TimerWidth(2), // bits for the sclk timer -- enough to count to T_sclk
     .T_sclk(2),     // sclk period, in clk tick counts. must be at least 2
     .T_sclk_cpol(1) // sclk time in the CPOL phase. must be at least 1
 ) spi_master_0 (
     .clk(),   // system clock
     .reset(), // system reset
     .transfer(),   //  in: begin a transfer. assert until accepted
-    .nbits_m1(), //  in [IndexWidth]: number of bits to transfer, minus 1
+    .nbits_m1(), //  in [clog2(WordWidth)]: number of bits to transfer, minus 1
     .mosi_word_in(), //  in [WordWidth]: word to transfer. hold until accepted
     .mosi_accepted(),   // out: one-shot pulse when a transfer begins
     .miso_valid(), // out: one-shot pulse when miso_word is valid to read
@@ -36,13 +34,11 @@ spi_master #(
 
 module spi_master #(
     parameter WordWidth = 8,
-    parameter IndexWidth = 3,
     parameter SPOL = 0,
     parameter CPOL = 0,
     parameter MOSI_PHA = 0,
     parameter MISO_PHA = 0,
     parameter MSB_FIRST = 1,
-    parameter TimerWidth = 2,
     parameter T_sclk = 2, //clk cycles (min 2, > T_sclk_cpol)
     parameter T_sclk_cpol = 1 //clk cycles (min 1)
 )(
@@ -62,9 +58,13 @@ module spi_master #(
     input wire miso
 );
 
+`include "functions.vh"
+
+localparam IndexWidth = clog2(WordWidth);
+
 localparam T_sclk_p = T_sclk_cpol - 1;
 localparam T_sclk_n = T_sclk - T_sclk_cpol - 1;
-
+localparam TimerWidth = clog2(`MAX(T_sclk_p, T_sclk_n));
 //states
 localparam IDLE = 0;
 localparam RUN = 1;
