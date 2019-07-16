@@ -41,10 +41,10 @@ spi_slave #(
     .mosi_word(),  // out [WordWidth]: received word. read when mosi_valid == 1
     .miso_word_in(), // in [WordWidth]: word to transfer. hold until accepted
     .miso_accepted(), // out: one-shot pulse when miso_word_in is registered
-    .ssel(), //  in: slave select (sync externally to clk)
-    .sclk(), //  in: SPI clock (sync externally to clk)
-    .mosi(), //  in: master out, slave in (sync externally to clk)
-    .miso()  // out: master in, slave out (sync externally to clk)
+    .ssel(), //  in: slave select (synced internally to clk)
+    .sclk(), //  in: SPI clock (synced internally to clk)
+    .mosi(), //  in: master out, slave in
+    .miso()  // out: master in, slave out
 );
 */
 
