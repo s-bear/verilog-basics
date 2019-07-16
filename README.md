@@ -33,3 +33,4 @@ up to run all of the tests using `iverilog` and `vvp`.
 - [ ] hardware testing of uart.v -- had some issues with iCE40 at 5 MHz, 19200 baud before adding resynchronization code.
 - [ ] is ram_dp_ice40.v necessary?? Does it do anything the synthesis tools don't do automatically?
 - [ ] report on hardware testing, synthesis info, etc?
+- [ ] spi_slave.v: figure out how SyncStages changes timing requirements
