@@ -18,8 +18,12 @@ up to run all of the tests using `iverilog` and `vvp`.
 
 - `spi_master.v` SPI Master
 - `spi_slave.v` SPI Slave
+- `uart.v` UART with flow control and FIFO interface.
 
 ## Utility
 
+- `functions.vh` Handy functions and macros (MIN, MAX, cdiv, clog2)
+- `debounce.v` Button debouncing, including various glitch-sensitive behaviors
+- `pwm.v` Pulse-width modulation, including a spread-spectrum mode
 - `synchronizer.v` Shift register for synchronizing across clock domains
 - `lfsr.v` Linear-feedback shift register for pseudorandom bit streams
