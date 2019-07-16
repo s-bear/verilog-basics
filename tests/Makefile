@@ -6,10 +6,11 @@ V_FILES = $(wildcard *.v)
 TEST_FILES = $(filter test% %_tb.v,$(V_FILES))
 SRC_FILES = $(filter-out test% %_tb.v,$(V_FILES))
 MODULE_DIRS = ..
+INCLUDE_DIRS = ..
 
 VC = iverilog
-VCFLAGS = -v -Wall $(addprefix -y,$(MODULE_DIRS))
-CHECKFLAGS = -Wall $(addprefix -y,$(MODULE_DIRS))
+VCFLAGS = -v -Wall $(addprefix -y,$(MODULE_DIRS)) $(addprefix -I,$(INCLUDE_DIRS))
+CHECKFLAGS = -Wall $(addprefix -y,$(MODULE_DIRS)) $(addprefix -I,$(INCLUDE_DIRS))
 
 SIM = vvp
 SIMFLAGS = -v
