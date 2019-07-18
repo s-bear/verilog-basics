@@ -17,11 +17,23 @@ For half-duplex operation, you can use the rx_active and tx_active outputs to
   gate tx_start and rx_enable, respectively:
     .rx_enable(~tx_active && ( ... )),
     .tx_start(~rx_active && ( ... )),
-  Additionally, use the tx_active signal to drive the tristate output_enable.
-  The Cooldown parameter keeps rx_active asserted for a number of baud periods
-    after the last stop bit was received just in case our timers are running
-    fast and the (other) transmitter begins a new transmission soon after we
-    assert rx_done.
+  Additionally, use tx_active to control tristate output:
+    assign transmission_line = tx_active ? txd : 1'bZ;
+  When operating in half-duplex mode you need to be careful of contention on the
+    transmission line. This can be done through hardware flow control, but that
+    seems unlikely if you're minimizing wires enough that you need half-duplex
+    comm's. Consider using a master/slave protocol with clearly delimited
+    messages. E.g: master sends "command;" and then waits until it receives
+    from the slave "command:response;" before sending another message. The slave
+    would buffer received bytes until it receives a ";" then echo the command as
+    an acknowledgement, process the command, send the response, and ";" to end.
+    An alternative would be for the slave to immediately echo each received byte
+    but such a protocol would be annoying to program on a PC.
+
+The Cooldown parameter keeps rx_active asserted for a number of baud periods
+  after the last stop bit was received just in case our timers are running
+  fast and the (other) transmitter begins a new transmission soon after we
+  assert rx_done.
 
 uart #(
     .ClkFreq(50000000), //in Hz
@@ -145,7 +157,7 @@ always @* begin
     //state machine
     case(rx_state)
     RX_IDLE: if(rx_enable == 1'b1 && rxd == 1'b0) begin
-        //we've detected a start bit
+        //we've detected a start bit. begin sampling
         rx_samples_D = 0;
         rx_sample_count_D = Samples-1;
         rx_timer_D = FirstSampleCount-1;
