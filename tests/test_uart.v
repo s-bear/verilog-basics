@@ -1,6 +1,8 @@
 `timescale 1ns/10ps
 /*
-
+test_uart.v
+(C) 2019-07-18 Samuel B Powell
+samuel.powell@uq.edu.au
 */
 
 module test_uart;
@@ -20,6 +22,7 @@ parameter RXBaudRate = 19200;
 parameter DataBits = 8;
 parameter StopBits = 1;
 parameter ParityBits = 1;
+parameter ParityOdd = 1;
 parameter ErrorBits = 1;
 parameter Samples = 8;
 parameter Cooldown = 1;
@@ -56,6 +59,7 @@ uart #(
     .DataBits(DataBits),   //typically 7 or 8
     .StopBits(StopBits),   //typically 1 or 2
     .ParityBits(ParityBits), //0 or 1
+    .ParityOdd(ParityOdd),
     .Samples(Samples),    //number of samples per baud
     .Cooldown(Cooldown)    //baud periods after stop bit before rx_active deasserts
 ) tx_uart (
@@ -85,6 +89,7 @@ uart #(
     .DataBits(DataBits),   //typically 7 or 8
     .StopBits(StopBits),   //typically 1 or 2
     .ParityBits(ParityBits), //0 or 1
+    .ParityOdd(ParityOdd),
     .Samples(Samples),    //number of samples per baud
     .Cooldown(Cooldown)    //baud periods after stop bit before rx_active deasserts
 ) rx_uart (
