@@ -11,7 +11,7 @@ This module includes synchonizers for ssel and sclk to clk controlled by the
 SyncStages parameter. If you don't want synchronization, set SyncStages to 0.
 If SyncStages is nonzero, be sure that clk is sufficiently faster than sclk that
 the protocol timing is not overly disturbed. With SyncStages == 2, clk should be
-at least N times faster than sclk.
+at least ?? times faster than sclk.
 
 While SSEL is asserted, every sclk cycle shifts another bit in/out.
 As soon as WordWidth bits are shifted in, mosi_valid is pulsed for a single clk
