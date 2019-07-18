@@ -144,14 +144,12 @@ always @* begin
 
     //state machine
     case(rx_state)
-    RX_IDLE: begin
-        if(rxd == 1'b0) begin //start bit, maybe
-            //begin sampling to make sure
-            rx_samples_D = 0;
-            rx_sample_count_D = Samples-1;
-            rx_timer_D = FirstSampleCount-1;
-            rx_state_D = RX_START;
-        end
+    RX_IDLE: if(rx_enable == 1'b1 && rxd == 1'b0) begin
+        //we've detected a start bit
+        rx_samples_D = 0;
+        rx_sample_count_D = Samples-1;
+        rx_timer_D = FirstSampleCount-1;
+        rx_state_D = RX_START;
     end
     RX_START: begin //reading the start bit
         if(rx_timer == 0 && rx_sample_count == 0) begin
