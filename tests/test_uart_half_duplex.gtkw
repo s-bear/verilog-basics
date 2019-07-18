@@ -1,0 +1,70 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Thu Jul 18 04:05:35 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/verilog-basics/tests/test_uart_half_duplex.fst"
+[dumpfile_mtime] "Thu Jul 18 03:59:30 2019"
+[dumpfile_size] 44490
+[savefile] "/mnt/c/Users/uqspowe6/source/verilog-basics/tests/test_uart_half_duplex.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -1 -1
+*-30.000000 180000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_uart_half_duplex.
+[sst_width] 238
+[signals_width] 263
+[sst_expanded] 1
+[sst_vpaned_height] 307
+@28
+test_uart_half_duplex.clk
+test_uart_half_duplex.reset
+@200
+-
+-UART 0
+@28
+test_uart_half_duplex.f0_empty
+test_uart_half_duplex.uart_0.tx_start
+@22
+test_uart_half_duplex.u0_tx_word[7:0]
+@28
+test_uart_half_duplex.u0_tx_done
+test_uart_half_duplex.u0_tx_active
+@200
+-
+@28
+test_uart_half_duplex.uart_0.rx_enable
+@22
+test_uart_half_duplex.u0_rx_word[7:0]
+@28
+test_uart_half_duplex.u0_rx_active
+test_uart_half_duplex.u0_rx_done
+@200
+-
+-TRANSMISSION
+@28
+test_uart_half_duplex.transmission_line
+test_uart_half_duplex.u0_rtr_n
+test_uart_half_duplex.u1_rtr_n
+@200
+-
+-UART 1
+@28
+test_uart_half_duplex.f1_empty
+test_uart_half_duplex.uart_1.tx_start
+@22
+test_uart_half_duplex.u1_tx_word[7:0]
+@28
+test_uart_half_duplex.u1_tx_done
+test_uart_half_duplex.u1_tx_active
+@200
+-
+@28
+test_uart_half_duplex.f1_full
+test_uart_half_duplex.uart_1.rx_enable
+@22
+test_uart_half_duplex.u1_rx_word[7:0]
+@28
+test_uart_half_duplex.u1_rx_done
+test_uart_half_duplex.u1_rx_error
+[pattern_trace] 1
+[pattern_trace] 0
