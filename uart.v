@@ -35,6 +35,8 @@ The Cooldown parameter keeps rx_active asserted for a number of baud periods
   fast and the (other) transmitter begins a new transmission soon after we
   assert rx_done.
 
+rxd and cts_n are both synchronized to clk with 2-stage shift registers.
+
 uart #(
     .ClkFreq(50000000), //in Hz
     .BaudRate(9600),
@@ -100,11 +102,11 @@ module uart #(
 `include "functions.vh"
 
 //how many clocks is each Baud 
-localparam BaudCount = ClkFreq / BaudRate;
-localparam SampleCount = ClkFreq / (BaudRate*Samples);
-localparam FirstSampleCount = BaudCount - SampleCount*(Samples-1); //account for the remainder
+localparam BaudTicks = ClkFreq / BaudRate;
+localparam SampleTicks = ClkFreq / (BaudRate*Samples);
+localparam FirstSampleTicks = BaudTicks - SampleTicks*(Samples-1); //account for the remainder
 localparam SampleBits = clog2(Samples);
-localparam BaudTBits = clog2(BaudCount);
+localparam BaudTBits = clog2(BaudTicks);
 
 /* RECEIVER STATES */
 localparam [3:0]
@@ -122,12 +124,14 @@ reg [2:0] rx_bit, rx_bit_D;
 reg rx_error_D, rx_done_D;
 reg [DataBits-1:0] rx_word_D;
 reg rx_parity, rx_parity_D;
+reg [1:0] rxd_sync_reg; //rxd synchronizer shift register
 reg [SampleBits-1:0] rx_samples, rx_samples_D, rx_sample_count, rx_sample_count_D;
 reg [BaudTBits-1:0] rx_timer, rx_timer_D;
 
 /* RECEIVER LOGIC */
 assign rtr_n = ~rx_enable | rx_error;
-wire rx_sample_bit = (rx_samples >= Samples/2);
+wire rxd_sync = rxd_sync_reg[0];
+wire rx_sample_bit = rx_samples[SampleBits-1]; //the MSb of the sampler
 assign rx_active = !(rx_state == RX_IDLE || rx_state == RX_HOLD);
 always @* begin
     rx_state_D = rx_state;
@@ -139,7 +143,6 @@ always @* begin
     rx_samples_D = rx_samples;
     rx_sample_count_D = rx_sample_count;
     rx_timer_D = rx_timer;
-    
     //reset the error state when we finish an rx cycle
     if(rx_done) rx_error_D = 0;
 
@@ -147,20 +150,19 @@ always @* begin
     if(rx_timer > 0) begin
         //decrement the timer
         rx_timer_D = rx_timer - 1;
-    end else if(rx_sample_count > 0) begin
+    end else if(rx_sample_count > 0) begin // rx_timer == 0
         //take another sample
-        rx_samples_D = rx_samples + rxd;
+        if(rx_sample_bit == 1'b0) rx_samples_D = rx_samples + rxd_sync;
         rx_sample_count_D = rx_sample_count - 1;
-        rx_timer_D = SampleCount - 1;
+        rx_timer_D = SampleTicks - 1;
     end
-
     //state machine
     case(rx_state)
-    RX_IDLE: if(rx_enable == 1'b1 && rxd == 1'b0) begin
+    RX_IDLE: if(rx_enable == 1'b1 && rxd_sync == 1'b0) begin
         //we've detected a start bit. begin sampling
         rx_samples_D = 0;
         rx_sample_count_D = Samples-1;
-        rx_timer_D = FirstSampleCount-1;
+        rx_timer_D = FirstSampleTicks-1;
         rx_state_D = RX_START;
     end
     RX_START: begin //reading the start bit
@@ -170,7 +172,7 @@ always @* begin
                 rx_state_D = RX_DATA;
                 rx_samples_D = 0;
                 rx_sample_count_D = Samples-1;
-                rx_timer_D = FirstSampleCount-1;
+                rx_timer_D = FirstSampleTicks-1;
                 rx_bit_D = DataBits-1;
                 rx_word_D = 0;
                 rx_parity_D = ParityOdd[0];
@@ -188,7 +190,7 @@ always @* begin
             //prepare for the next set of samples
             rx_samples_D = 0;
             rx_sample_count_D = Samples-1;
-            rx_timer_D = FirstSampleCount-1;
+            rx_timer_D = FirstSampleTicks-1;
             //was that the last bit of the word?
             if(rx_bit == 0) begin
                 //move on to either the parity bit or the stop bit(s)
@@ -215,19 +217,19 @@ always @* begin
             rx_bit_D = StopBits-1;
             rx_samples_D = 0;
             rx_sample_count_D = Samples-1;
-            rx_timer_D = FirstSampleCount-1;
+            rx_timer_D = FirstSampleTicks-1;
         end
     end
     RX_STOP: begin
         if(rx_bit == 0) begin //the last stop bit
-            if(rx_sample_bit == 1'b1 && rxd == 1'b0) begin
+            if(rx_sample_bit == 1'b1 && rxd_sync == 1'b0) begin
                 //the start bit came early
                 if(rx_enable == 1'b1) begin
                     //we can start a new cycle
                     rx_done_D = 1'b1;
                     rx_samples_D = 0;
                     rx_sample_count_D = Samples-1;
-                    rx_timer_D = FirstSampleCount-1;
+                    rx_timer_D = FirstSampleTicks-1;
                     rx_state_D = RX_START;
                 end else begin
                     //we have to wait to be enabled again
@@ -243,18 +245,19 @@ always @* begin
                 if(rx_enable == 1'b1) begin
                     //we can keep going
                     rx_done_D = 1'b1;
-                    if(rxd == 1'b0) begin
+                    if(rxd_sync == 1'b0) begin
                         //and start a new cycle
                         rx_samples_D = 0;
                         rx_sample_count_D = Samples-1;
-                        rx_timer_D = FirstSampleCount-1;
+                        rx_timer_D = FirstSampleTicks-1;
                         rx_state_D = RX_START;
                     end else begin
                         //and wait for a new cycle
                         if(Cooldown > 0) begin
                             rx_samples_D = 0;
                             rx_sample_count_D = Samples-1;
-                            rx_timer_D = FirstSampleCount-1;
+                            rx_timer_D = FirstSampleTicks-1;
+                            rx_bit_D = Cooldown-1;
                             rx_state_D = RX_COOLDOWN;
                         end else begin
                             rx_state_D = RX_IDLE;
@@ -270,21 +273,21 @@ always @* begin
             rx_bit_D = rx_bit - 1;
             rx_samples_D = 0;
             rx_sample_count_D = Samples-1;
-            rx_timer_D = FirstSampleCount - 1;
+            rx_timer_D = FirstSampleTicks - 1;
         end
     end
     RX_HOLD: if(rx_enable == 1'b1) begin
-        //if rx_enable went low while we were receiving data, we'll keep it
-        //in our register until it goes high again
+        //if rx_enable went low while we were receiving data, we'll keep the
+        //data in our register until rx_enable goes high again
         rx_done_D = 1;
         rx_state_D = RX_IDLE;
     end
     RX_COOLDOWN: begin
         //like RX_IDLE but it keeps rx_active asserted until the timers expire
-        if(rxd == 1'b0) begin //start bit
+        if(rxd_sync == 1'b0) begin //start bit
             rx_samples_D = 0;
             rx_sample_count_D = Samples-1;
-            rx_timer_D = FirstSampleCount-1;
+            rx_timer_D = FirstSampleTicks-1;
             rx_state_D = RX_START;
         end else if(rx_timer == 0 && rx_sample_count == 0) begin
             if(rx_bit == 0) begin
@@ -293,7 +296,7 @@ always @* begin
                 rx_bit_D = rx_bit - 1;
                 rx_samples_D = 0;
                 rx_sample_count_D = Samples-1;
-                rx_timer_D = FirstSampleCount-1;
+                rx_timer_D = FirstSampleTicks-1;
             end
         end
     end
@@ -317,7 +320,7 @@ reg [DataBits-1:0] tx_word_sr, tx_word_sr_D;
 reg [BaudTBits-1:0] tx_timer, tx_timer_D;
 reg tx_parity, tx_parity_D;
 
-reg [2:0] cts_sync_reg; //synchronizer shift register for cts_n
+reg [1:0] cts_sync_reg; //synchronizer shift register for cts_n
 wire cts_sync = cts_sync_reg[0];
 
 /* TRANSMITTER LOGIC */
@@ -337,14 +340,14 @@ always @* begin
         if(cts_sync == 1'b1 && tx_start == 1'b1) begin
             tx_state_D = TX_START;
             tx_word_sr_D = tx_word;
-            tx_timer_D = BaudCount-1;
+            tx_timer_D = BaudTicks-1;
             tx_parity_D = ParityOdd[0];
             txd_D = 1'b0; //start bit
         end
     end
     TX_START: begin
         if(tx_timer == 0) begin
-            tx_timer_D = BaudCount-1;
+            tx_timer_D = BaudTicks-1;
             tx_state_D = TX_DATA;
             tx_bit_D = DataBits-1;
             tx_parity_D = tx_parity ^ tx_word_sr[0];
@@ -354,7 +357,7 @@ always @* begin
     end
     TX_DATA: begin
         if(tx_timer == 0) begin
-            tx_timer_D = BaudCount-1;
+            tx_timer_D = BaudTicks-1;
             if(tx_bit == 0) begin
                 if(ParityBits == 0) begin
                     tx_state_D = TX_STOP;
@@ -374,7 +377,7 @@ always @* begin
     end
     TX_PARITY: begin
         if(tx_timer == 0) begin
-            tx_timer_D = BaudCount-1;
+            tx_timer_D = BaudTicks-1;
             tx_state_D = TX_STOP;
             tx_bit_D = StopBits-1;
             txd_D = 1'b1;
@@ -386,7 +389,7 @@ always @* begin
                 tx_state_D = TX_DONE;
                 tx_done_D = 1'b1;
             end else begin
-                tx_timer_D = BaudCount-1;
+                tx_timer_D = BaudTicks-1;
                 tx_bit_D = tx_bit - 1;
             end
         end
@@ -410,6 +413,7 @@ always @(posedge clk) begin
         rx_samples <= 0;
         rx_sample_count <= 0;
         rx_timer <= 0;
+        rxd_sync_reg <= 0;
         //transmitter
         tx_state <= TX_IDLE;
         tx_bit <= 0;
@@ -430,6 +434,7 @@ always @(posedge clk) begin
         rx_samples <= rx_samples_D;
         rx_sample_count <= rx_sample_count_D;
         rx_timer <= rx_timer_D;
+        rxd_sync_reg <= {rxd, rxd_sync_reg[1]};
         //transmitter
         tx_state <= tx_state_D;
         tx_bit <= tx_bit_D;
@@ -438,7 +443,7 @@ always @(posedge clk) begin
         tx_word_sr <= tx_word_sr_D;
         tx_timer <= tx_timer_D;
         tx_parity <= tx_parity_D;
-        cts_sync_reg <= {~cts_n, cts_sync_reg[2:1]};
+        cts_sync_reg <= {~cts_n, cts_sync_reg[1]};
     end
 end
 
