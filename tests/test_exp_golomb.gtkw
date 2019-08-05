@@ -1,0 +1,38 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Mon Aug  5 10:41:58 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/verilog-basics/tests/test_exp_golomb.fst"
+[dumpfile_mtime] "Mon Aug  5 10:40:13 2019"
+[dumpfile_size] 6456
+[savefile] "/mnt/c/Users/uqspowe6/source/verilog-basics/tests/test_exp_golomb.gtkw"
+[timestart] 0
+[size] 1204 600
+[pos] -1 -1
+*-17.000000 7770000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_exp_golomb.
+[sst_width] 189
+[signals_width] 139
+[sst_expanded] 1
+[sst_vpaned_height] 160
+@28
+test_exp_golomb.clk
+test_exp_golomb.reset
+test_exp_golomb.enable
+@24
+test_exp_golomb.x
+@28
+test_exp_golomb.code
+test_exp_golomb.data_valid
+@24
+test_exp_golomb.data[7:0]
+@200
+-
+@28
+test_exp_golomb.exp_golomb_0.counting
+@22
+test_exp_golomb.exp_golomb_0.b[3:0]
+test_exp_golomb.exp_golomb_0.offset[7:0]
+test_exp_golomb.exp_golomb_0.base[7:0]
+[pattern_trace] 1
+[pattern_trace] 0
