@@ -30,6 +30,12 @@ This might make sense to use if you have several equally likely values at the
 low end and don't want to grow the code too quickly. (Here, 7 requires 4 bits
 rather than 7 bits as in k=2, k0=0).
 
+This code can be used for basic lossless compression, either of data where small
+integers are more frequent than large, or the codes can be used to look up data
+in a fixed dictionary. (Low indices hold more common data than high indices).
+Optimal choices for k0 and k depend on the relative frequencies of the data for
+the particular application.
+
 exp_golomb #(
     .DataWidth(16), //output data width
     .K0(2), //minimum number of code data bits (min code size is K0 + 1)

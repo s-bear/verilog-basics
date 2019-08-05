@@ -19,6 +19,7 @@ up to run all of the tests using `iverilog` and `vvp`.
 - `spi_master.v` SPI Master
 - `spi_slave.v` SPI Slave
 - `uart.v` UART with flow control and FIFO interface.
+- `exp_golomb.v` Exponential-Golomb decoder, a universal variable-length code.
 
 ## Utility
 
@@ -31,8 +32,8 @@ up to run all of the tests using `iverilog` and `vvp`.
 ## TO DO
 
 - [ ] test_debounce.v
-- [ ] hardware testing of uart.v -- had some issues with iCE40 at 5 MHz, 19200 baud before adding resynchronization code. Is it fixed?
 - [ ] is ram_dp_ice40.v necessary?? Does it do anything the synthesis tools don't do automatically?
 - [ ] report on hardware testing, synthesis info, etc?
 - [ ] spi_slave.v: figure out how SyncStages changes timing requirements
 - [ ] Would it make sense to have a tristate io buffer with vendor implementations?
+- [ ] How would exp_golomb be used with SPI/UART? Need to work on interface.
