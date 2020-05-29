@@ -3,6 +3,9 @@
 test_uart.v
 (C) 2019-07-18 Samuel B Powell
 samuel.powell@uq.edu.au
+
+tx_fifo -> tx_uart -> rx_uart -> rx_fifo
+
 */
 
 module test_uart;
